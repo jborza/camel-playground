@@ -1,6 +1,5 @@
 package com.github.jborza.camel.component.smbj;
 
-import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.File;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
@@ -8,10 +7,7 @@ import org.apache.camel.component.file.GenericFile;
 import org.apache.camel.component.file.GenericFileConsumer;
 import org.apache.camel.component.file.GenericFileEndpoint;
 import org.apache.camel.component.file.GenericFileOperations;
-import org.apache.camel.util.FileUtil;
-import org.apache.camel.util.ObjectHelper;
 
-import java.io.IOException;
 import java.util.List;
 
 public class SmbConsumer extends GenericFileConsumer<File> {

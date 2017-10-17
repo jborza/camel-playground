@@ -1,11 +1,7 @@
 package com.github.jborza.camel.component.smbj;
 
-import com.hierynomus.smbj.SMBClient;
-import com.hierynomus.smbj.SmbConfig;
-import com.hierynomus.smbj.share.DiskEntry;
 import com.hierynomus.smbj.share.File;
 import org.apache.camel.CamelContext;
-import org.apache.camel.Component;
 import org.apache.camel.component.file.GenericFileComponent;
 import org.apache.camel.component.file.GenericFileEndpoint;
 
