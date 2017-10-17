@@ -1,5 +1,6 @@
 package com.github.jborza.camel.component.smbj;
 
+import com.hierynomus.msfscc.fileinformation.FileIdBothDirectoryInformation;
 import com.hierynomus.smbj.share.File;
 import org.apache.camel.Message;
 import org.apache.camel.Processor;
@@ -10,6 +11,8 @@ import org.apache.camel.component.file.GenericFileOperations;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 public class SmbConsumer extends GenericFileConsumer<File> {
 
     private String endpointPath;
@@ -17,7 +20,12 @@ public class SmbConsumer extends GenericFileConsumer<File> {
 
     public SmbConsumer(GenericFileEndpoint<File> endpoint, Processor processor, GenericFileOperations<File> operations) {
         super(endpoint, processor, operations);
-        this.endpointPath = endpoint.getConfiguration().getDirectory();
+        SmbConfiguration config = (SmbConfiguration) endpoint.getConfiguration();
+        this.endpointPath = config.getPath();
+    }
+
+    private SmbOperations getOperations(){
+        return (SmbOperations) operations;
     }
 
     @Override
@@ -29,8 +37,13 @@ public class SmbConsumer extends GenericFileConsumer<File> {
         }
 
         //TODO doing 1 level just now
-        List<File> smbFiles;
-        smbFiles  = operations.listFiles(fileName);
+        List<FileIdBothDirectoryInformation> smbFiles = getOperations().listFilesSpecial(fileName);
+        List<GenericFile<File>> genericFiles = smbFiles.stream()
+                .map(f -> asGenericFile(f))
+                .collect(toList());
+        for (GenericFile<File> gf:genericFiles) {
+            fileList.add(gf);
+        }
         return true;
 
 //        List<DiskEntry> smbFiles;
@@ -74,6 +87,16 @@ public class SmbConsumer extends GenericFileConsumer<File> {
     @Override
     protected void updateFileHeaders(GenericFile<File> genericFile, Message message) {
         // TODO
+    }
+
+    private GenericFile<File> asGenericFile(FileIdBothDirectoryInformation info){
+        GenericFile<File> f = new GenericFile<>();
+        f.setRelativeFilePath(info.getFileName());
+        f.setAbsolute(true);
+        f.setEndpointPath(endpointPath);
+        f.setAbsoluteFilePath(endpointPath+"/"+info.getFileName());
+//        f.setAbsoluteFilePath(path);
+        return f;
     }
 
     // TODO: this needs some checking!

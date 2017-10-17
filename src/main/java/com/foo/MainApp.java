@@ -26,7 +26,8 @@ public class MainApp {
 
                 from("smb3://smb@192.168.0.108/share_smb/data?password=smb")
 //                from("timer://foo?period=1s")
-                        .to("log://block");
+                        .to("log://block")
+                        .to("file://out");
 
             }
         });
