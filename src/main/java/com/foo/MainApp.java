@@ -20,20 +20,27 @@ public class MainApp {
         CamelContext context = main.getOrCreateCamelContext();
         SmbComponent component = new SmbComponent(context);
         context.addComponent("smb3",component);
+//        context.addRoutes(new RouteBuilder() {
+//            @Override
+//            public void configure() throws Exception {
+//                from("smb3://smb@192.168.0.108/share_smb/data?password=smb")
+//                        .to("log://block")
+//                        .to("file://out");
+//
+//            }
+//        });
         context.addRoutes(new RouteBuilder() {
             @Override
             public void configure() throws Exception {
-
-                from("smb3://smb@192.168.0.108/share_smb/data?password=smb")
-//                from("timer://foo?period=1s")
+                from("file://in")
                         .to("log://block")
-                        .to("file://out");
+                .to("smb3://smb@192.168.0.105/share_smb/output?password=smb");
 
             }
         });
         context.start();
         Thread.sleep(2000);
-        context.stop();;
+        context.stop();
         //main.run(args);
     }
 

@@ -12,14 +12,19 @@ import com.hierynomus.smbj.share.DiskShare;
 import com.hierynomus.smbj.share.File;
 import org.apache.camel.Exchange;
 import org.apache.camel.component.file.*;
+import org.apache.camel.util.ExchangeHelper;
 import org.apache.camel.util.IOHelper;
 import org.apache.camel.util.ObjectHelper;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+
+import static com.hierynomus.mssmb2.SMB2CreateDisposition.FILE_CREATE;
 
 public class SmbOperations implements GenericFileOperations<File> {
     private final SMBClient client;
@@ -131,11 +136,6 @@ public class SmbOperations implements GenericFileOperations<File> {
     }
 
     @Override
-    public boolean storeFile(String s, Exchange exchange) throws GenericFileOperationFailedException {
-        return false;
-    }
-
-    @Override
     public String getCurrentDirectory() throws GenericFileOperationFailedException {
         return null;
     }
@@ -172,7 +172,6 @@ public class SmbOperations implements GenericFileOperations<File> {
                 if(isDirectory)
                     continue;
                 files.add(f);
-                System.out.println("yo @ "+f.getFileName());
             }
         } catch (Exception e) {
             throw new GenericFileOperationFailedException("Could not get files " + e.getMessage(), e);
@@ -236,4 +235,37 @@ public class SmbOperations implements GenericFileOperations<File> {
         }
     }
 
-}
+    @Override
+    public boolean storeFile(String name, Exchange exchange) {
+        String storeName = getPath(name);
+
+        InputStream inputStream = null;
+        try {
+            inputStream = exchange.getIn().getMandatoryBody(InputStream.class);
+
+            login();
+            SmbConfiguration config = ((SmbConfiguration)endpoint.getConfiguration());
+
+            DiskShare share = (DiskShare) session.connectShare(config.getShare());
+            GenericFile<File> inputFile = (GenericFile<File>)exchange.getIn().getBody();
+            Path path = Paths.get(config.getPath(),inputFile.getRelativeFilePath());
+            File file = share.openFile(path.toString(), EnumSet.of(AccessMask.GENERIC_WRITE), null, SMB2ShareAccess.ALL, FILE_CREATE, null);
+
+            OutputStream smbout = file.getOutputStream();
+            byte[] buf = new byte[512 * 1024];
+            int numRead;
+            while ((numRead = inputStream.read(buf)) >= 0) {
+                smbout.write(buf, 0, numRead);
+            }
+            smbout.close();
+            //TODO set last modified date to lastModifiedDate(exchange)
+            //file.setFileInformation(); ?
+            return true;
+        } catch (Exception e) {
+            throw new GenericFileOperationFailedException("Cannot store file " + storeName, e);
+        } finally {
+            IOHelper.close(inputStream, "store: " + storeName);
+        }
+    }
+
+    }

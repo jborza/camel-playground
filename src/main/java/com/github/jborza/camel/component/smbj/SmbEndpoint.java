@@ -53,9 +53,7 @@ public class SmbEndpoint extends GenericFileEndpoint<File> {
 
     @Override
     public GenericFileProducer<File> createProducer() throws Exception {
-        //return new SmbProducer(this, createSmbOperations());
-        //TODO implement
-        return null;
+        return new SmbProducer(this, createSmbOperations());
     }
 
     @Override
