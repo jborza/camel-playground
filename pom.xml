@@ -33,10 +33,17 @@
 
     <!-- https://mvnrepository.com/artifact/com.hierynomus/smbj -->
     <dependency>
-      <groupId>com.hierynomus</groupId>
-      <artifactId>smbj</artifactId>
-      <version>0.4.0</version>
+      <groupId>com.github.jborza</groupId>
+      <artifactId>camel-smbj</artifactId>
+      <version>1.0-SNAPSHOT</version>
     </dependency>
+
+    <!--&lt;!&ndash; https://mvnrepository.com/artifact/com.hierynomus/smbj &ndash;&gt;-->
+    <!--<dependency>-->
+    <!--<groupId>com.hierynomus</groupId>-->
+    <!--<artifactId>smbj</artifactId>-->
+    <!--<version>0.5.1</version>-->
+    <!--</dependency>-->
 
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -55,11 +62,11 @@
       <version>2.20.0</version>
     </dependency>
 
-    <dependency>
+    <!--<dependency>
       <groupId>org.apache-extras.camel-extra</groupId>
       <artifactId>camel-jcifs</artifactId>
       <version>2.18.0</version>
-    </dependency>
+    </dependency>-->
 
     <!-- logging -->
     <dependency>
@@ -84,7 +91,23 @@
       <artifactId>camel-test</artifactId>
       <scope>test</scope>
     </dependency>
+
+    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.6</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.easymock</groupId>
+      <artifactId>easymock</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
   </dependencies>
+
 
   <build>
     <defaultGoal>install</defaultGoal>
